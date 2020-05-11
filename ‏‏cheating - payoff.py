@@ -4,8 +4,8 @@ import pandas as pd
 
 # Empty lists
 trail_num_list, trails_total_payoff, trails_adding_points, trails_omitted_points, trails_type, conditions_list,\
-trails_type_list, enforcement_list, player_choice_list, p_inspection_list, fine_size_list, \
-true_side_list, block_num_list, game_num_list = ([] for i in range(14))
+trails_type_list, enforcement_list, player_choice_list, p_inspection_list, fine_size_list, true_side_list, \
+block_num_list, game_num_list, correct_side_list, trails_alternative_points, block_error_list = ([] for i in range(17))
 
 
 def true_side_trail(round_type):  # The side which has more dots
@@ -17,6 +17,16 @@ def true_side_trail(round_type):  # The side which has more dots
 
 
 def random_player(correct_side):
+    if random.randint(0, 1) == 1:
+        choice = 'right'
+    else:
+        choice = 'left'
+
+    return choice
+
+
+def win_stay_lose_shift_player(correct_side):
+    # first move is random, on the others moves choose the best for the previous move
     if random.randint(0, 1) == 1:
         choice = 'right'
     else:
@@ -55,11 +65,13 @@ def reward_for_choice(condition, choice, correct_side, inspection):
 
     if condition == 'high_enforcement' or condition == 'low_enforcement':
         if choice == 'right':
+            alternative_choice = 1
             added_points = 20
             points_for_choice = added_points
 
         else:
             added_points = 1
+            alternative_choice = 20
             points_for_choice = added_points
 
         if condition == 'high_enforcement' and correct_side != choice and inspection == 1:
@@ -73,13 +85,15 @@ def reward_for_choice(condition, choice, correct_side, inspection):
     else:
         if choice == 'right':
             added_points = 2
+            alternative_choice = 1
             points_for_choice = added_points
 
         else:
             added_points = 1
+            alternative_choice = 2
             points_for_choice = added_points
 
-    return points_for_choice, added_points, omitted_points
+    return points_for_choice, added_points, omitted_points, alternative_choice
 
 
 # print(reward_for_choice('low_enforcement', 'right', 'left', 1))
@@ -132,6 +146,11 @@ def play_game():
                 player_choice = random_player(true_side)  # Player choice
                 player_choice_list.append(player_choice)
 
+                if player_choice != true_side:
+                    correct_side_list.append(0)
+                else:
+                    correct_side_list.append(1)
+
                 # Enforcement
                 enforcement_array = trail_inspection(game_condition)  # There is inspection?
 
@@ -151,14 +170,19 @@ def play_game():
                 trail_total = trail_payoff[0]
                 trail_added = trail_payoff[1]
                 trail_omitted = trail_payoff[2]
+                trail_alternative = trail_payoff[3]
 
                 trails_total_payoff.append(trail_total)
                 trails_adding_points.append(trail_added)
                 trails_omitted_points.append(trail_omitted)
+                trails_alternative_points.append(trail_alternative)
+
+                block_errors = sum(correct_side_list)
+                block_error_list.append(block_errors)
 
     return game_num_list, block_num_list, trail_num_list, conditions_list, p_inspection_list, fine_size_list,\
-           trails_type_list, enforcement_list, trails_total_payoff, trails_adding_points, trails_omitted_points, true_side_list, \
-           player_choice_list
+           trails_type_list, enforcement_list, correct_side_list, trails_total_payoff, trails_alternative_points, trails_adding_points, trails_omitted_points, true_side_list, \
+           player_choice_list, block_error_list
 
 
 # print(play_game())
@@ -167,11 +191,11 @@ def play_game():
 def save_to_csv():
     play_game()
     df = pd.DataFrame(list(zip(game_num_list, block_num_list, trail_num_list, conditions_list, p_inspection_list,
-                               fine_size_list, trails_type_list, enforcement_list, trails_total_payoff,
-                               trails_adding_points, trails_omitted_points, true_side_list, player_choice_list)),
+                               fine_size_list, trails_type_list, enforcement_list, correct_side_list, trails_total_payoff,
+                               trails_adding_points, trails_alternative_points, trails_omitted_points, true_side_list, player_choice_list, block_error_list)),
                       columns=['Game Num', 'Block Num', 'Trail Num', 'Condition', 'P Inspection', 'Fine Size',
-                               'Trail Type', 'Inspection', 'Trials Payoff', 'Points earned', 'Points Fined', 'True Side',
-                               'Choice'])
+                               'Trail Type', 'Inspection', 'Choice Correct', 'Trials Payoff', 'Points earned', 'Alternative Points', 'Points Fined', 'True Side',
+                               'Choice', 'Block Errors'])
 
     print(df)
     df.to_csv("output.csv", index=False)
