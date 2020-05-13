@@ -96,9 +96,6 @@ def reward_for_choice(condition, choice, correct_side, inspection):
     return points_for_choice, added_points, omitted_points, alternative_choice
 
 
-# print(reward_for_choice('low_enforcement', 'right', 'left', 1))
-
-
 def trail_for_block():  # create one array which contain the number of each type
     global trails_type
     for t in range(100):
@@ -177,12 +174,42 @@ def play_game():
                 trails_omitted_points.append(trail_omitted)
                 trails_alternative_points.append(trail_alternative)
 
-                block_errors = sum(correct_side_list)
-                block_error_list.append(block_errors)
+                # block errors
+                if condition == 0 and block == 0 and trail == 99:
+                    first_block = sum(correct_side_list)
+                    print(first_block)
+                elif condition == 0 and block == 1 and trail == 99:
+                    second_block = sum(correct_side_list) - first_block
+                    print(second_block)
+                elif condition == 1 and block == 0 and trail == 99:
+                    third_block = sum(correct_side_list) - (second_block + first_block)
+                    print(third_block)
+                elif condition == 1 and block == 1 and trail == 99:
+                    fourth_block = sum(correct_side_list) - (third_block + second_block + first_block)
+                    print(fourth_block)
+                elif condition == 2 and block == 0 and trail == 99:
+                    fifth_block = sum(correct_side_list) - (fourth_block + third_block + second_block + first_block)
+                    print(fifth_block)
+                elif condition == 2 and block == 1 and trail == 99:
+                    sixth_block = sum(correct_side_list) - (fifth_block + fourth_block + third_block + second_block + first_block)
+                    print(sixth_block)
+                    game_errors = sum(correct_side_list)
+                    for i in range(100):
+                        block_error_list.append(first_block)
+                    for i in range(100):
+                        block_error_list.append(second_block)
+                    for i in range(100):
+                        block_error_list.append(third_block)
+                    for i in range(100):
+                        block_error_list.append(fourth_block)
+                    for i in range(100):
+                        block_error_list.append(fifth_block)
+                    for i in range(100):
+                        block_error_list.append(sixth_block)
 
     return game_num_list, block_num_list, trail_num_list, conditions_list, p_inspection_list, fine_size_list,\
-           trails_type_list, enforcement_list, correct_side_list, trails_total_payoff, trails_alternative_points, trails_adding_points, trails_omitted_points, true_side_list, \
-           player_choice_list, block_error_list
+           trails_type_list, enforcement_list, correct_side_list, trails_total_payoff, trails_alternative_points,\
+           trails_adding_points, trails_omitted_points, true_side_list, player_choice_list, block_error_list
 
 
 # print(play_game())
@@ -192,9 +219,11 @@ def save_to_csv():
     play_game()
     df = pd.DataFrame(list(zip(game_num_list, block_num_list, trail_num_list, conditions_list, p_inspection_list,
                                fine_size_list, trails_type_list, enforcement_list, correct_side_list, trails_total_payoff,
-                               trails_adding_points, trails_alternative_points, trails_omitted_points, true_side_list, player_choice_list, block_error_list)),
+                               trails_adding_points, trails_alternative_points, trails_omitted_points, true_side_list,
+                               player_choice_list, block_error_list)),
                       columns=['Game Num', 'Block Num', 'Trail Num', 'Condition', 'P Inspection', 'Fine Size',
-                               'Trail Type', 'Inspection', 'Choice Correct', 'Trials Payoff', 'Points earned', 'Alternative Points', 'Points Fined', 'True Side',
+                               'Trail Type', 'Inspection', 'Choice Correct', 'Trials Payoff', 'Points earned',
+                               'Alternative Points', 'Points Fined', 'True Side',
                                'Choice', 'Block Errors'])
 
     print(df)
@@ -204,7 +233,7 @@ def save_to_csv():
 save_to_csv()
 
 
-def run_multiple_games(num_games=1):
+def run_multiple_games(num_games=10):
 
     for num in range(num_games):  # loop that runs on the range of games number
         save_to_csv()  # insert to the variable what the function returns
