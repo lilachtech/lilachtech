@@ -5,7 +5,8 @@ import pandas as pd
 # Empty lists
 trail_num_list, trails_total_payoff, trails_adding_points, trails_omitted_points, trails_type, conditions_list,\
 trails_type_list, enforcement_list, player_choice_list, p_inspection_list, fine_size_list, true_side_list, \
-block_num_list, game_num_list, correct_side_list, trails_alternative_points, block_error_list = ([] for i in range(17))
+block_num_list, game_num_list, correct_side_list, trails_alternative_points, error_list, block_error_list, \
+block_payoff_list, game_point_list = ([] for i in range(20))
 
 
 def true_side_trail(round_type):  # The side which has more dots
@@ -25,14 +26,30 @@ def random_player(correct_side):
     return choice
 
 
-def win_stay_lose_shift_player(correct_side):
-    # first move is random, on the others moves choose the best for the previous move
-    if random.randint(0, 1) == 1:
-        choice = 'right'
+def win_stay_lose_shift_player(player_choice_list, trails_total_payoff, trails_alter_total, trail_num, block_num):
+    last_choice = player_choice_list[trail_num - 1]
+    trail_payoff = trails_total_payoff[trail_num - 1]
+    trail_alter = trails_alter_total[trail_num - 1]
+    if block_num == 0 and trail_num == 0:
+        if random.randint(0, 1) == 1:
+            choice = 'right'
+        else:
+            choice = 'left'
     else:
-        choice = 'left'
+        if trail_payoff > trail_alter:
+            choice = last_choice
+            print('big')
+        else:
+            print('small')
+            if last_choice == 'right':
+                choice = 'left'
+            elif last_choice == 'left':
+                choice = 'right'
 
     return choice
+
+
+print(win_stay_lose_shift_player(['right', 'right'], [20, 1], [1, 20], 1, 0))
 
 
 def trail_inspection(condition):  # test if there is inspection on the current side
@@ -145,8 +162,10 @@ def play_game():
 
                 if player_choice != true_side:
                     correct_side_list.append(0)
+                    error_list.append(1)
                 else:
                     correct_side_list.append(1)
+                    error_list.append(0)
 
                 # Enforcement
                 enforcement_array = trail_inspection(game_condition)  # There is inspection?
@@ -176,40 +195,49 @@ def play_game():
 
                 # block errors
                 if condition == 0 and block == 0 and trail == 99:
-                    first_block = sum(correct_side_list)
-                    print(first_block)
+                    first_block = sum(error_list)
+                    b1_points = sum(trails_total_payoff)
                 elif condition == 0 and block == 1 and trail == 99:
-                    second_block = sum(correct_side_list) - first_block
-                    print(second_block)
+                    second_block = sum(error_list) - first_block
+                    b2_points = sum(trails_total_payoff) - b1_points
                 elif condition == 1 and block == 0 and trail == 99:
-                    third_block = sum(correct_side_list) - (second_block + first_block)
-                    print(third_block)
+                    third_block = sum(error_list) - (second_block + first_block)
+                    b3_points = sum(trails_total_payoff) - (b2_points + b1_points)
                 elif condition == 1 and block == 1 and trail == 99:
-                    fourth_block = sum(correct_side_list) - (third_block + second_block + first_block)
-                    print(fourth_block)
+                    fourth_block = sum(error_list) - (third_block + second_block + first_block)
+                    b4_points = sum(trails_total_payoff) - (b3_points + b2_points + b1_points)
                 elif condition == 2 and block == 0 and trail == 99:
-                    fifth_block = sum(correct_side_list) - (fourth_block + third_block + second_block + first_block)
-                    print(fifth_block)
+                    fifth_block = sum(error_list) - (fourth_block + third_block + second_block + first_block)
+                    b5_points = sum(trails_total_payoff) - (b4_points + b3_points + b2_points + b1_points)
                 elif condition == 2 and block == 1 and trail == 99:
-                    sixth_block = sum(correct_side_list) - (fifth_block + fourth_block + third_block + second_block + first_block)
-                    print(sixth_block)
-                    game_errors = sum(correct_side_list)
+                    sixth_block = sum(error_list) - (fifth_block + fourth_block + third_block + second_block + first_block)
+                    b6_points = sum(trails_total_payoff) - (b5_points + b4_points + b3_points + b2_points + b1_points)
+                    game_errors = sum(error_list)
                     for i in range(100):
                         block_error_list.append(first_block)
+                        block_payoff_list.append(b1_points)
                     for i in range(100):
                         block_error_list.append(second_block)
+                        block_payoff_list.append(b2_points)
                     for i in range(100):
                         block_error_list.append(third_block)
+                        block_payoff_list.append(b3_points)
                     for i in range(100):
                         block_error_list.append(fourth_block)
+                        block_payoff_list.append(b4_points)
                     for i in range(100):
                         block_error_list.append(fifth_block)
+                        block_payoff_list.append(b5_points)
                     for i in range(100):
                         block_error_list.append(sixth_block)
+                        block_payoff_list.append(b6_points)
+                    for i in range(600):
+                        game_point_list.append(sum(trails_total_payoff))
 
     return game_num_list, block_num_list, trail_num_list, conditions_list, p_inspection_list, fine_size_list,\
            trails_type_list, enforcement_list, correct_side_list, trails_total_payoff, trails_alternative_points,\
-           trails_adding_points, trails_omitted_points, true_side_list, player_choice_list, block_error_list
+           trails_adding_points, trails_omitted_points, true_side_list, player_choice_list, block_error_list, \
+           game_point_list, block_payoff_list
 
 
 # print(play_game())
@@ -220,17 +248,17 @@ def save_to_csv():
     df = pd.DataFrame(list(zip(game_num_list, block_num_list, trail_num_list, conditions_list, p_inspection_list,
                                fine_size_list, trails_type_list, enforcement_list, correct_side_list, trails_total_payoff,
                                trails_adding_points, trails_alternative_points, trails_omitted_points, true_side_list,
-                               player_choice_list, block_error_list)),
+                               player_choice_list, block_error_list, block_payoff_list, game_point_list)),
                       columns=['Game Num', 'Block Num', 'Trail Num', 'Condition', 'P Inspection', 'Fine Size',
                                'Trail Type', 'Inspection', 'Choice Correct', 'Trials Payoff', 'Points earned',
                                'Alternative Points', 'Points Fined', 'True Side',
-                               'Choice', 'Block Errors'])
+                               'Choice', 'Block Errors', 'Block Points', 'Final score'])
 
     print(df)
     df.to_csv("output.csv", index=False)
 
 
-save_to_csv()
+# save_to_csv()
 
 
 def run_multiple_games(num_games=10):
