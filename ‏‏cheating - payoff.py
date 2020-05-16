@@ -26,21 +26,27 @@ def random_player(correct_side):
     return choice
 
 
-def win_stay_lose_shift_player(player_choice_list, trails_total_payoff, trails_alter_total, trail_num, block_num):
-    last_choice = player_choice_list[trail_num - 1]
-    trail_payoff = trails_total_payoff[trail_num - 1]
-    trail_alter = trails_alter_total[trail_num - 1]
-    if block_num == 0 and trail_num == 0:
+def win_stay_lose_shift_player(choice_list, trails_payoff, alternative_points, trail_num):
+
+    if len(choice_list) == 0 or len(choice_list) % 100 == 0:
         if random.randint(0, 1) == 1:
             choice = 'right'
+            print('random - right')
         else:
             choice = 'left'
+            print('random - left')
     else:
+        last_choice = choice_list[trail_num - 1]
+        trail_payoff = trails_payoff[trail_num - 1]
+        trail_alter = alternative_points[trail_num - 1]
+        print(last_choice, trail_payoff, trail_alter)
+        print(choice_list)
+
         if trail_payoff > trail_alter:
             choice = last_choice
-            print('big')
+            print('earned points: ' + str(trail_payoff) + 'alter points: ' + str(trail_alter))
+            print('choice bigger than alter')
         else:
-            print('small')
             if last_choice == 'right':
                 choice = 'left'
             elif last_choice == 'left':
@@ -49,7 +55,7 @@ def win_stay_lose_shift_player(player_choice_list, trails_total_payoff, trails_a
     return choice
 
 
-print(win_stay_lose_shift_player(['right', 'right'], [20, 1], [1, 20], 1, 0))
+# print(win_stay_lose_shift_player([], [20, 1], [1, 20], 1, 0))
 
 
 def trail_inspection(condition):  # test if there is inspection on the current side
@@ -94,10 +100,12 @@ def reward_for_choice(condition, choice, correct_side, inspection):
         if condition == 'high_enforcement' and correct_side != choice and inspection == 1:
             omitted_points = -20
             points_for_choice = added_points + omitted_points
+            alternative_choice = alternative_choice + omitted_points
 
         elif condition == 'low_enforcement' and correct_side != choice and inspection == 1:
             omitted_points = -180
             points_for_choice = added_points + omitted_points
+            alternative_choice = alternative_choice + omitted_points
 
     else:
         if choice == 'right':
@@ -157,7 +165,8 @@ def play_game():
                 true_side = true_side_trail(round_type)  # Which side has more dots
                 true_side_list.append(true_side)
 
-                player_choice = random_player(true_side)  # Player choice
+                # player_choice = random_player(true_side)  # Player choice
+                player_choice = win_stay_lose_shift_player(player_choice_list, trails_total_payoff, trails_alternative_points, trail)
                 player_choice_list.append(player_choice)
 
                 if player_choice != true_side:
@@ -258,7 +267,7 @@ def save_to_csv():
     df.to_csv("output.csv", index=False)
 
 
-# save_to_csv()
+save_to_csv()
 
 
 def run_multiple_games(num_games=10):
