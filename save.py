@@ -120,17 +120,27 @@ def reward_for_choice(condition, choice, correct_side, inspection):
             alternative_choice = 20
             points_for_choice = added_points
 
-        # choice is wrong
-        if correct_side != choice:
+        if correct_side == choice:
+        # dont change the points_for_choice
+        # dont change omitted_points
+        # dont change added_points
+        # dont change alternative
+
+        else:  # choice is wrong
             if inspection == 1:
                 if condition == 'high_enforcement':
+
                     omitted_points = -20
+                    points_for_choice = points_for_choice + omitted_points
+                    # dont change alternative
+                    # dont change added_points
 
                 elif condition == 'low_enforcement':
                     omitted_points = -180
+                    points_for_choice = points_for_choice + omitted_points
+                    # dont change alternative
+                    # dont change added_points
 
-                points_for_choice = points_for_choice + omitted_points
-                alternative_choice = alternative_choice + omitted_points
     else:
         if choice == 'right':
             added_points = 2
