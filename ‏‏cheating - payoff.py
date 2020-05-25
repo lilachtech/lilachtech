@@ -107,17 +107,20 @@ def trail_inspection(condition):  # test if there is inspection on the current s
     return inspection_trail, probability, fine_size
 
 
-def reward_for_choice(condition, choice, correct_side, inspection):
+def reward_for_my_choice(condition, choice, correct_side, inspection):
     omitted_points = 0
 
+    if(choice == 'right'):
+        alternative_choice = reward_for_alternative_choice(condition, 'left', correct_side, inspection)
+    else:
+        alternative_choice = reward_for_alternative_choice(condition, 'right', correct_side, inspection)
+
     if condition == 'high_enforcement' or condition == 'low_enforcement':
-        if choice == 'right':
-            alternative_choice = 1
+        if choice == 'right':            
             added_points = 20
             points_for_choice = added_points
         else:
             added_points = 1
-            alternative_choice = 20
             points_for_choice = added_points
 
         # choice is wrong
@@ -130,19 +133,50 @@ def reward_for_choice(condition, choice, correct_side, inspection):
                     omitted_points = -180
 
                 points_for_choice = points_for_choice + omitted_points
-                alternative_choice = alternative_choice + omitted_points
+               
+    else:
+        if choice == 'right':
+            added_points = 2   
+            points_for_choice = added_points
+
+        else:
+            added_points = 1   
+            points_for_choice = added_points
+
+    return points_for_choice, added_points, omitted_points, alternative_choice
+
+    def reward_for_alternative_choice (condition, choice, correct_side, inspection):
+
+    omitted_points = 0
+
+    if condition == 'high_enforcement' or condition == 'low_enforcement':
+        if choice == 'right':
+            added_points = 20
+            points_for_choice = added_points
+        else:
+            added_points = 1
+            points_for_choice = added_points
+
+        # choice is wrong
+        if correct_side != choice:
+            if inspection == 1:
+                if condition == 'high_enforcement':
+                    omitted_points = -20
+
+                elif condition == 'low_enforcement':
+                    omitted_points = -180
+
+                points_for_choice = points_for_choice + omitted_points
     else:
         if choice == 'right':
             added_points = 2
-            alternative_choice = 1
             points_for_choice = added_points
 
         else:
             added_points = 1
-            alternative_choice = 2
             points_for_choice = added_points
 
-    return points_for_choice, added_points, omitted_points, alternative_choice
+    return points_for_choice
 
 
 def trail_for_block():  # create one array which contain the number of each type
@@ -212,7 +246,8 @@ def play_game():
                 fine_size_list.append(fine_size)
 
                 # Trail Payoffs
-                trail_payoff = reward_for_choice(game_condition, player_choice, true_side, enforcement)  # points earned
+                trail_payoff = reward_for_my_choice(game_condition, player_choice, true_side, enforcement)  # points earned
+
                 trail_total = trail_payoff[0]
                 trail_added = trail_payoff[1]
                 trail_omitted = trail_payoff[2]
