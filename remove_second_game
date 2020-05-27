@@ -1,0 +1,8 @@
+import pandas as pd
+
+file = pd.read_csv('5ec22961a5533967a888db87.csv')  # open file
+low_condition = file[file['conditions'] == 'low_enforcement'].index  # look for low_enforcement
+file.drop(low_condition, inplace=True)  # remove it
+
+
+file.to_csv(r'new_5ec22961a5533967a888db87.csv', index=False)  # save in a new csv file

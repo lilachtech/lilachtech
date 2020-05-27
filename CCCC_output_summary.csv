@@ -1,0 +1,3 @@
+block_number,b1_sum,b2_sum,age,attention,trial_number,conditions,p_inspection,inspection,fine_size,trial_payoff,alternative_payoff,choice_correct,rt_choice,block_errors,final_errors,block_payoff,final_payoff,error,b1_cheating,b2_cheating
+1,7,0,1180,0,3104,59,5310,52,1040,92,7,52,5.578000000000001,885,1652,35400,85432,7,7,0
+2,0,12,1180,0,2999,59,5310,54,1080,67,-128,47,4.855999999999999,767,1652,50032,85432,12,0,12

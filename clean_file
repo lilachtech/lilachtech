@@ -1,0 +1,28 @@
+import pandas as pd
+
+# open file
+df = pd.read_csv('new_5ec22961a5533967a888db87.csv')
+
+# clean the data
+df['conditions'].replace('no_enforcement2', 3, inplace=True)
+df['fine_size'].replace('-', 0, inplace=True)
+df.drop(['points_right', 'points_left', 'exchange_ratio', 'basic_payment', 'date', 'time'], axis=1, inplace=True)
+
+# --- adding calculation to the data --- #
+
+# creating new column with final blocks errors
+block_errors = df['block_errors'].value_counts()
+extract_block_errors = block_errors.index.tolist()
+b1_errors = extract_block_errors[0]  # b1 errors
+b2_errors = extract_block_errors[1]  # b2 errors
+final_errors = b1_errors + b2_errors  # full game errors
+idx = 19
+df.insert(loc=idx, column='final_errors', value=final_errors)
+
+
+# only temptation trails
+df = df.query("profitable_side != true_side")
+
+df['error'] = df.apply(lambda row: 0 if (row['choice_correct'] == 1) else 1, axis=1)
+cheating_rates = df.groupby('user_id')['error'].sum()
+df.to_csv(r'clean_5ec22961a5533967a888db87.csv', index=False)

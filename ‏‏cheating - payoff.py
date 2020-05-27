@@ -53,33 +53,26 @@ def win_stay_lose_shift_player(choice_list, trails_payoff, alternative_points, t
     return choice
 
 
-def small_samples(choice_list, trails_payoff, alternative_points, trail_num):
+def small_samples(choice_list):
+    sample_list = []
 
-    if len(choice_list) <= 4:
-        if random.randint(0, 1) == 0:
-            choice = 'right'
-            print('random - right')
-        else:
-            choice = 'left'
-            print('random - left')
-    else:
-        last_choice = choice_list[trail_num - 1]
-        trail_payoff = trails_payoff[trail_num - 1]
-        trail_alter = alternative_points[trail_num - 1]
-        print(last_choice, trail_payoff, trail_alter)
-        print(choice_list)
+    for i in range(0, len(choice_list)):
+        sample_list.append(i+1)
 
-        if trail_payoff > trail_alter:
-            choice = last_choice
-        else:
-            if last_choice == 'right':
-                choice = 'left'
-            elif last_choice == 'left':
-                choice = 'right'
+    k = 5
+    selected_numbers = random.choices(sample_list, k=k)
 
-    return choice
+    idx_1 = selected_numbers[0]
+    idx_2 = selected_numbers[1]
+    print(idx_1)
 
-# print(win_stay_lose_shift_player([], [20, 1], [1, 20], 1, 0))
+    choice_1 = choice_list[idx_1]
+    print(choice_1)
+    return selected_numbers
+
+
+choice_list = ['right', 'right', 'left', 'right', 'left', 'right', 'left', 'right', 'left', 'left']
+print(small_samples(choice_list))
 
 
 def trail_inspection(condition):  # test if there is inspection on the current side
@@ -311,7 +304,7 @@ def save_to_csv():
     df.to_csv("output.csv", index=False)
 
 
-save_to_csv()
+# save_to_csv()
 
 
 def run_multiple_games(num_games=10):
