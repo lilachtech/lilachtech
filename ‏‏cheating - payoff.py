@@ -31,16 +31,12 @@ def win_stay_lose_shift_player(choice_list, trails_payoff, alternative_points, t
     if len(choice_list) == 0 or len(choice_list) % 100 == 0:
         if random.randint(0, 1) == 0:
             choice = 'right'
-            print('random - right')
         else:
             choice = 'left'
-            print('random - left')
     else:
         last_choice = choice_list[trail_num - 1]
         trail_payoff = trails_payoff[trail_num - 1]
         trail_alter = alternative_points[trail_num - 1]
-        print(last_choice, trail_payoff, trail_alter)
-        print(choice_list)
 
         if trail_payoff > trail_alter:
             choice = last_choice
@@ -54,33 +50,26 @@ def win_stay_lose_shift_player(choice_list, trails_payoff, alternative_points, t
 
 
 def small_samples():
-
-    # true_side_list
-    # trails_total_payoff
-    # trails_alternative_points
     choice = 'right'
+    sample_choices, sample_correct_sides, sample_payoffs, sample_alt_payoffs = [], [], [], []
+    k = 2
 
-    sample_choices, sample_correct_sides, sample_payoffs,sample_alt_payoffs = []
-
-    k = 5
- 
-    # we want to sample k random indexes 
-    for i in range(0, k):
-        #get the random index from choice list length
-        random_index = random.randint(0, len(player_choice_list)-1)
-
-        sample_choices.append( player_choice_list[random_index] )
-        sample_correct_sides.append( true_side_list[random_index] )
-        sample_payoffs.append( trails_total_payoff[random_index] )
-        sample_alt_payoffs.append( trails_alternative_points[random_index] )
-
-
+    if len(player_choice_list) == 0 or len(player_choice_list) % 100 == 0:
+        if random.randint(0, 1) == 0:
+            choice = 'right'
+        else:
+            choice = 'left'
+    else:
+        # we want to sample k random indexes
+        for i in range(0, k):
+            # get the random index from choice list length
+            random_index = random.randint(0, len(player_choice_list)-1)
+            sample_choices.append(player_choice_list[random_index])
+            sample_correct_sides.append(correct_side_list[random_index])
+            sample_payoffs.append(trails_total_payoff[random_index])
+            sample_alt_payoffs.append(trails_alternative_points[random_index])
 
     return choice
-
-
-choice_list = ['right', 'right', 'left', 'right', 'left', 'right', 'left', 'right', 'left', 'left']
-print(small_samples(choice_list))
 
 
 def trail_inspection(condition):  # test if there is inspection on the current side
@@ -188,10 +177,13 @@ def play_game(game_num):
     for condition in range(3):
         if condition == 0:
             game_condition = 'high_enforcement'
+            # game_num += 1
         elif condition == 1:
             game_condition = 'low_enforcement'
+            # game_num += 2
         elif condition == 2:
             game_condition = 'no_enforcement'
+            # game_num += 3
 
         for block in range(2):
             trails_type = trail_for_block()
@@ -209,7 +201,7 @@ def play_game(game_num):
                 true_side_list.append(true_side)
 
                 # player_choice = random_player(true_side)  # Player choice
-                #player_choice = win_stay_lose_shift_player(player_choice_list, trails_total_payoff, trails_alternative_points, trail)
+                # player_choice = win_stay_lose_shift_player(player_choice_list, trails_total_payoff, trails_alternative_points, trail)
                 player_choice = small_samples()
                 player_choice_list.append(player_choice)
 
@@ -304,7 +296,7 @@ def save_to_csv(game_num):
                                trails_adding_points, trails_alternative_points, trails_omitted_points, true_side_list,
                                player_choice_list, block_error_list, block_payoff_list, game_point_list)),
                       columns=['Game Num', 'Block Num', 'Trail Num', 'Condition', 'P Inspection', 'Fine Size',
-                               'Trail Type', 'Inspection', 'Choice Correct', 'Trials Payoff', 'Points earned',
+                               'Trail Type', 'Inspection', 'Choice Correct', 'Trails Payoff', 'Points earned',
                                'Alternative Points', 'Points Fined', 'True Side',
                                'Choice', 'Block Errors', 'Block Points', 'Final score'])
 
@@ -312,14 +304,11 @@ def save_to_csv(game_num):
     df.to_csv("output.csv", index=False)
 
 
-# save_to_csv()
-
-
-def run_multiple_games(num_games=10):
+def run_multiple_games(num_games=2):
 
     for game_num in range(num_games):  # loop that runs on the range of games number
       
         save_to_csv(game_num)  # insert to the variable what the function returns
 
 
-# run_multiple_games()
+run_multiple_games()
