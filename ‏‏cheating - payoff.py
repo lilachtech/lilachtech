@@ -183,7 +183,7 @@ def trail_for_block():  # create one array which contain the number of each type
     return trails_type
 
 
-def play_game():
+def play_game(game_num):
 
     for condition in range(3):
         if condition == 0:
@@ -198,9 +198,8 @@ def play_game():
             random.shuffle(trails_type)
 
             for trail in range(100):  # one block
-                game_num_list.append(condition+1)  # list of number of game
                 block_num_list.append(block + 1)  # list of block num
-
+                game_num_list.append(game_num + 1)  # list of number of game
                 trail_num_list.append(trail + 1 + block * 100)
 
                 round_type = trails_type.pop()  # type of trail
@@ -298,8 +297,8 @@ def play_game():
 # print(play_game())
 
 
-def save_to_csv():
-    play_game()
+def save_to_csv(game_num):
+    play_game(game_num)
     df = pd.DataFrame(list(zip(game_num_list, block_num_list, trail_num_list, conditions_list, p_inspection_list,
                                fine_size_list, trails_type_list, enforcement_list, correct_side_list, trails_total_payoff,
                                trails_adding_points, trails_alternative_points, trails_omitted_points, true_side_list,
@@ -318,8 +317,9 @@ def save_to_csv():
 
 def run_multiple_games(num_games=10):
 
-    for num in range(num_games):  # loop that runs on the range of games number
-        save_to_csv()  # insert to the variable what the function returns
+    for game_num in range(num_games):  # loop that runs on the range of games number
+      
+        save_to_csv(game_num)  # insert to the variable what the function returns
 
 
 # run_multiple_games()
