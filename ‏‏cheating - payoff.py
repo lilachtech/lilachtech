@@ -54,6 +54,9 @@ def win_stay_lose_shift_player(choice_list, trails_payoff, alternative_points, t
 
 
 def small_samples(choice_list):
+    # true_side_list
+    # trails_total_payoff
+    # trails_alternative_points
 
     sampled_indexes = []
     sample_list = []
@@ -61,16 +64,16 @@ def small_samples(choice_list):
     k = 5
  
     # we want to sample k random indexes 
-    for i in range(0,k):
+    for i in range(0, k):
         #get the random index from choice list length
-        random_index = random.ranint(0,len(choice_list)-1)
+        random_index = random.randint(0, len(choice_list)-1)
         sampled_indexes.append(random_index)
 
         choice = choice_list[random_index]
         sample_list.append(choice)
         print(choice)
 
-    return selected_numbers
+    return sample_list, sampled_indexes
 
 
 choice_list = ['right', 'right', 'left', 'right', 'left', 'right', 'left', 'right', 'left', 'left']
