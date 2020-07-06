@@ -7,15 +7,7 @@ low_df = pd.read_csv('low_only.csv')
 # df.to_csv("low_only.csv", index=False)
 
 
-# for index, row in df.iterrows():
-#   #  print(row['c1'], row['c2'])
-# last = low_df.irow(0)
-# first = low_df.irow
-#
-# for i in range(1, df.shape[0]):
-#     print(last)
-#     print(df.irow(i))
-#     last = df.irow(i)
+
 choice_results_after_inspection = []
 
 for index, row in low_df.iterrows():
